@@ -11,7 +11,9 @@ this file and include it in basic-server.js so that it actually works.
 *Hint* Check out the node module documentation at http://nodejs.org/api/modules.html.
 
 **************************************************************/
-var messages = [{username: 'Dude', text: 'Hey.', objectId: 1}];
+var fs = require('fs');
+const url = require('url');
+var messages = [{username: 'Chatterbot', text: 'Welcome to Chatterbox!', roomname: 'lobby', objectId: 1}];
 var currentMessageId = 1;
 var defaultCorsHeaders = {
   'access-control-allow-origin': '*',
@@ -36,13 +38,44 @@ var requestHandler = function(request, response) {
   // debugging help, but you should always be careful about leaving stray
   // console.logs in your code.
   console.log('Serving request type ' + request.method + ' for url ' + request.url);
-
   // The outgoing status.
 
   // See the note below about CORS headers.
   var headers = defaultCorsHeaders;
 
-  if (request.method === 'GET' && request.url === '/classes/messages') {
+  if(request.method === 'GET' && (request.url === '/' || request.url.startsWith('/?username'))) {
+    fs.readFile(('./client/client/index.html'), function(err, data) {
+      if(err) {
+        var statusCode = 404;
+        headers['Content-Type'] = 'text/html';
+        response.writeHead(statusCode, headers);
+        response.end('Error reading index.html!');
+      } else {
+        var statusCode = 200;
+        headers['Content-Type'] = 'text/html';
+        response.writeHead(statusCode, headers);
+        response.end(data);
+      }
+    });
+  } else if(request.method === 'GET' && (request.url.endsWith('.html') || request.url.endsWith('.css')|| request.url.endsWith('.js') || request.url.endsWith('.gif'))) {
+    fs.readFile(('./client/client' + request.url), function(err, data) {
+      if(err) {
+        var statusCode = 404;
+        headers['Content-Type'] = 'text/html';
+        response.writeHead(statusCode, headers);
+        response.end('File does not exist!');
+      } else {
+        if(request.url.endsWith('.css')) {
+          headers['Content-Type'] = 'text/css';
+        } else {
+          headers['Content-Type'] = 'text';
+        }
+        var statusCode = 200;
+        response.writeHead(statusCode, headers);
+        response.end(data);
+      }
+    });
+  } else if (request.method === 'GET' && request.url === '/classes/messages') {
     var statusCode = 200;
     headers['Content-Type'] = 'application/json';
     response.writeHead(statusCode, headers);
