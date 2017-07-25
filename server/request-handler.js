@@ -43,13 +43,17 @@ var requestHandler = function(request, response) {
   // See the note below about CORS headers.
   var headers = defaultCorsHeaders;
 
+  var send404 = function(errorMessage) {
+    var statusCode = 404;
+    headers['Content-Type'] = 'text/html';
+    response.writeHead(statusCode, headers);
+    response.end(errorMessage);
+  };
+
   if (request.method === 'GET' && (request.url === '/' || request.url.startsWith('/?username'))) {
     fs.readFile(('./client/client/index.html'), function(err, data) {
       if (err) {
-        var statusCode = 404;
-        headers['Content-Type'] = 'text/html';
-        response.writeHead(statusCode, headers);
-        response.end('Error reading index.html!');
+        send404('Error reading index.html!');
       } else {
         var statusCode = 200;
         headers['Content-Type'] = 'text/html';
@@ -60,10 +64,7 @@ var requestHandler = function(request, response) {
   } else if (request.method === 'GET' && (request.url.endsWith('.html') || request.url.endsWith('.css') || request.url.endsWith('.js') || request.url.endsWith('.gif'))) {
     fs.readFile(('./client/client' + request.url), function(err, data) {
       if (err) {
-        var statusCode = 404;
-        headers['Content-Type'] = 'text/html';
-        response.writeHead(statusCode, headers);
-        response.end('File does not exist!');
+        send404('File does not exist!');
       } else {
         if (request.url.endsWith('.css')) {
           headers['Content-Type'] = 'text/css';
@@ -106,9 +107,7 @@ var requestHandler = function(request, response) {
     response.writeHead(statusCode, headers);
     response.end(JSON.stringify({messages: messages}));
   } else {
-    var statusCode = 404;
-    response.writeHead(statusCode, headers);
-    response.end();
+    send404('Resource could not be located!');
   }
 
   // Make sure to always call response.end() - Node may not send
