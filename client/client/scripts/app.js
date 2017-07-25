@@ -27,6 +27,7 @@ var app = {
 
     // Fetch previous messages
     app.startSpinner();
+    app.renderMessages();
     app.fetch(false);
 
     // Poll for new messages
@@ -63,7 +64,6 @@ var app = {
       data: { order: '-createdAt' },
       contentType: 'application/json',
       success: function(data) {
-        debugger;
         // Don't bother if we have nothing to work with
         if (!data.results || !data.results.length) { return; }
 

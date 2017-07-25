@@ -13,7 +13,7 @@ this file and include it in basic-server.js so that it actually works.
 **************************************************************/
 var fs = require('fs');
 const url = require('url');
-var messages = [{username: 'Chatterbot', text: 'Welcome to Chatterbox!', roomname: 'lobby', objectId: 1}];
+var messages = [];
 var currentMessageId = 1;
 var defaultCorsHeaders = {
   'access-control-allow-origin': '*',
