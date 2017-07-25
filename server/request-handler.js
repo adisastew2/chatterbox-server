@@ -43,9 +43,9 @@ var requestHandler = function(request, response) {
   // See the note below about CORS headers.
   var headers = defaultCorsHeaders;
 
-  if(request.method === 'GET' && (request.url === '/' || request.url.startsWith('/?username'))) {
+  if (request.method === 'GET' && (request.url === '/' || request.url.startsWith('/?username'))) {
     fs.readFile(('./client/client/index.html'), function(err, data) {
-      if(err) {
+      if (err) {
         var statusCode = 404;
         headers['Content-Type'] = 'text/html';
         response.writeHead(statusCode, headers);
@@ -57,15 +57,15 @@ var requestHandler = function(request, response) {
         response.end(data);
       }
     });
-  } else if(request.method === 'GET' && (request.url.endsWith('.html') || request.url.endsWith('.css')|| request.url.endsWith('.js') || request.url.endsWith('.gif'))) {
+  } else if (request.method === 'GET' && (request.url.endsWith('.html') || request.url.endsWith('.css') || request.url.endsWith('.js') || request.url.endsWith('.gif'))) {
     fs.readFile(('./client/client' + request.url), function(err, data) {
-      if(err) {
+      if (err) {
         var statusCode = 404;
         headers['Content-Type'] = 'text/html';
         response.writeHead(statusCode, headers);
         response.end('File does not exist!');
       } else {
-        if(request.url.endsWith('.css')) {
+        if (request.url.endsWith('.css')) {
           headers['Content-Type'] = 'text/css';
         } else {
           headers['Content-Type'] = 'text';
