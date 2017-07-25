@@ -61,6 +61,7 @@ var requestHandler = function(request, response) {
     response.end(JSON.stringify(msgs));
   } else if (request.method === 'POST') {
     var statusCode = 201;
+    //console.log(JSON.stringify(request._postData));
     headers['Content-Type'] = 'application/json';
     response.writeHead(statusCode, headers);
     response.end();
