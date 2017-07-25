@@ -11,7 +11,7 @@ this file and include it in basic-server.js so that it actually works.
 *Hint* Check out the node module documentation at http://nodejs.org/api/modules.html.
 
 **************************************************************/
-
+var messages = [{username: 'Dude', text: 'Hey.'}];
 var defaultCorsHeaders = {
   'access-control-allow-origin': '*',
   'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS',
@@ -46,7 +46,7 @@ var requestHandler = function(request, response) {
     headers['Content-Type'] = 'application/json';
     response.writeHead(statusCode, headers);
     var msgs = {};
-    msgs.results = [{username: 'Jono', text: 'Do my bidding!'}];
+    msgs.results = messages;
     response.end(JSON.stringify(msgs));
   } else if (request.method === 'OPTIONS' && request.url === '/?order=-createdAt') {
     var statusCode = 200;
@@ -57,13 +57,12 @@ var requestHandler = function(request, response) {
     headers['Content-Type'] = 'application/json';
     response.writeHead(statusCode, headers);
     var msgs = {};
-    msgs.results = [{username: 'Jono', text: 'Do my bidding!'}];
+    msgs.results = messages;
     response.end(JSON.stringify(msgs));
-  } else if (request.method === 'POST' && request.url === '/classes/messages') {
+  } else if (request.method === 'POST') {
     var statusCode = 201;
-   
+    headers['Content-Type'] = 'application/json';
     response.writeHead(statusCode, headers);
-    
     response.end();
   } else {
     var statusCode = 404;
