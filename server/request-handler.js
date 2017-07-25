@@ -37,21 +37,33 @@ var requestHandler = function(request, response) {
   console.log('Serving request type ' + request.method + ' for url ' + request.url);
 
   // The outgoing status.
-  var statusCode = 200;
 
   // See the note below about CORS headers.
   var headers = defaultCorsHeaders;
 
-  if(request.method === 'GET' && request.url === '/classes/messages') {
+  if (request.method === 'GET' && request.url === '/classes/messages') {
+    var statusCode = 200;
     headers['Content-Type'] = 'text/html';
     response.writeHead(statusCode, headers);
-    response.write('<divv>hello</div>');
-  }
-
-  if(request.method === 'GET' && request.url === 'app.server') {
-    headers['Content-Type'] = 'application/json';
+    var msgs = {};
+    msgs.results = [];
+    response.end(JSON.stringify(msgs));
+  } else if (request.method === 'OPTIONS' && request.url === '/?order=-createdAt') {
+    var statusCode = 200;
+    // headers['Content-Type'] = 'application/json';
     response.writeHead(statusCode, headers);
-    response.end(JSON.stringify({results: []}));
+    // //response.end(JSON.stringify({results: []}));
+    response.end();
+  } else if (request.method === 'POST' && request.url === '/classes/messages') {
+    var statusCode = 201;
+   
+    response.writeHead(statusCode, headers);
+    
+    response.end();
+  } else {
+    var statusCode = 404;
+    response.writeHead(statusCode, headers);
+    response.end();
   }
 
   // Make sure to always call response.end() - Node may not send
