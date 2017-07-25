@@ -43,17 +43,22 @@ var requestHandler = function(request, response) {
 
   if (request.method === 'GET' && request.url === '/classes/messages') {
     var statusCode = 200;
-    headers['Content-Type'] = 'text/html';
+    headers['Content-Type'] = 'application/json';
     response.writeHead(statusCode, headers);
     var msgs = {};
-    msgs.results = [];
+    msgs.results = [{username: 'Jono', text: 'Do my bidding!'}];
     response.end(JSON.stringify(msgs));
   } else if (request.method === 'OPTIONS' && request.url === '/?order=-createdAt') {
     var statusCode = 200;
-    // headers['Content-Type'] = 'application/json';
     response.writeHead(statusCode, headers);
-    // //response.end(JSON.stringify({results: []}));
     response.end();
+  } else if (request.method === 'GET' && request.url === '/?order=-createdAt') {
+    var statusCode = 200;
+    headers['Content-Type'] = 'application/json';
+    response.writeHead(statusCode, headers);
+    var msgs = {};
+    msgs.results = [{username: 'Jono', text: 'Do my bidding!'}];
+    response.end(JSON.stringify(msgs));
   } else if (request.method === 'POST' && request.url === '/classes/messages') {
     var statusCode = 201;
    
