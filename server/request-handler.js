@@ -13,13 +13,35 @@ this file and include it in basic-server.js so that it actually works.
 **************************************************************/
 var fs = require('fs');
 const url = require('url');
-var messages = [];
-var currentMessageId = 1;
+var data = {messages: [{username: 'Chatterbot', text: 'Welcome to Chatterbox!', roomname: 'lobby', objectId: 1}], currentMessageId: 0};
 var defaultCorsHeaders = {
   'access-control-allow-origin': '*',
   'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS',
   'access-control-allow-headers': 'content-type, accept',
   'access-control-max-age': 10 // Seconds.
+};
+
+var saveMessage = function(message, response) {
+  // var data = JSON.parse(loadMessages(response));
+  // data.currentMessageId++;
+  // message.messageId = data.currentMessageId;
+  // data.messages.push(message);
+  // fs.writeFile('./server/db.txt', JSON.stringify(data), function(err){
+  //   loadMessages(response);
+  // });
+};
+var loadMessages = function(response) {
+  fs.readFile(('./server/db.txt'), function(err, fileBuffer) {
+    if (err) {
+      fs.writeFile('./server/db.txt', JSON.stringify(data), function(err){
+        response.end(JSON.stringify(data.messages));
+      });
+    } else {
+      var messages = {results: JSON.parse(fileBuffer.toString()).messages};
+      console.log(JSON.stringify(messages));
+      response.end(JSON.stringify(messages));
+    }
+  });
 };
 
 var requestHandler = function(request, response) {
@@ -80,9 +102,7 @@ var requestHandler = function(request, response) {
     var statusCode = 200;
     headers['Content-Type'] = 'application/json';
     response.writeHead(statusCode, headers);
-    var msgs = {};
-    msgs.results = messages;
-    response.end(JSON.stringify(msgs));
+    loadMessages(response);
   } else if (request.method === 'OPTIONS' && request.url === '/?order=-createdAt') {
     var statusCode = 200;
     response.writeHead(statusCode, headers);
@@ -91,21 +111,17 @@ var requestHandler = function(request, response) {
     var statusCode = 200;
     headers['Content-Type'] = 'application/json';
     response.writeHead(statusCode, headers);
-    var msgs = {};
-    msgs.results = messages;
-    response.end(JSON.stringify(msgs));
+    loadMessages(response);
   } else if (request.method === 'POST') {
     var statusCode = 201;
     //console.log(JSON.stringify(request._postData));
     request.on('data', (data) => {
       var message = JSON.parse(data);
-      currentMessageId++;
-      message.objectId = currentMessageId;
-      messages.push(message);
+      saveMessage(message);
     });
     headers['Content-Type'] = 'application/json';
     response.writeHead(statusCode, headers);
-    response.end(JSON.stringify({messages: messages}));
+    loadMessages(response);
   } else {
     send404('Resource could not be located!');
   }
