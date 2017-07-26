@@ -1,1 +1,0 @@
-{"messages":[{"username":"Chatterbot","text":"Welcome to Chatterbox!","roomname":"lobby","objectId":1}],"currentMessageId":0}

@@ -13,7 +13,7 @@ this file and include it in basic-server.js so that it actually works.
 **************************************************************/
 var fs = require('fs');
 const url = require('url');
-var data = {messages: [{username: 'Chatterbot', text: 'Welcome to Chatterbox!', roomname: 'lobby', objectId: 1}], currentMessageId: 0};
+var data = {messages: [], currentMessageId: 0};
 var defaultCorsHeaders = {
   'access-control-allow-origin': '*',
   'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS',
@@ -22,23 +22,28 @@ var defaultCorsHeaders = {
 };
 
 var saveMessage = function(message, response) {
-  // var data = JSON.parse(loadMessages(response));
-  // data.currentMessageId++;
-  // message.messageId = data.currentMessageId;
-  // data.messages.push(message);
-  // fs.writeFile('./server/db.txt', JSON.stringify(data), function(err){
-  //   loadMessages(response);
-  // });
+  fs.readFile(('./server/db.db'), function(err, fileBuffer) {
+    if(err) {
+      throw err;
+    } else {
+      var database = JSON.parse(fileBuffer.toString());
+      database.currentMessageId++;
+      message.objectId = database.currentMessageId;
+      database.messages.push(message);
+      fs.writeFile(('./server/db.db'), JSON.stringify(database), function(err) {
+        response.end(JSON.stringify(database.messages)); 
+      });
+    }
+  });
 };
 var loadMessages = function(response) {
-  fs.readFile(('./server/db.txt'), function(err, fileBuffer) {
+  fs.readFile(('./server/db.db'), function(err, fileBuffer) {
     if (err) {
-      fs.writeFile('./server/db.txt', JSON.stringify(data), function(err){
+      fs.writeFile('./server/db.db', JSON.stringify(data), function(err) {
         response.end(JSON.stringify(data.messages));
       });
     } else {
       var messages = {results: JSON.parse(fileBuffer.toString()).messages};
-      console.log(JSON.stringify(messages));
       response.end(JSON.stringify(messages));
     }
   });
@@ -117,7 +122,7 @@ var requestHandler = function(request, response) {
     //console.log(JSON.stringify(request._postData));
     request.on('data', (data) => {
       var message = JSON.parse(data);
-      saveMessage(message);
+      saveMessage(message, response);
     });
     headers['Content-Type'] = 'application/json';
     response.writeHead(statusCode, headers);
